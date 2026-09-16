@@ -1,4 +1,8 @@
 package eventify.dto;
 
-public class ErrorDetail {
-}
+import eventify.entity.Role;
+
+public record AuthResponse(
+        String token,
+        Role role
+) {}
