@@ -1,2 +1,61 @@
 services:
-  
+  db:
+    image: postgres:16-alpine
+    container_name: eventify-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - eventify-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eventify-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eventify-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
+      BOOKING_EXPIRY_MINUTES: ${BOOKING_EXPIRY_MINUTES}
+    ports:
+      - "8080:8080"
+    networks:
+      - eventify-net
+
+  frontend:
+    build:
+      context: ./booking-ui
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:8080
+        REACT_APP_USE_MOCKS: "false"
+    container_name: eventify-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - eventify-net
+
+volumes:
+  eventify-pgdata:
+
+networks:
+  eventify-net:
+    driver: bridge
