@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public BookingResponse getById(Long id, Long currentUserId, boolean isAdmin) {
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Бронирование не найдено: id=" + id));
+                .orElseThrow(() -> new NotFoundException("Booking not found: id=" + id));
         ensureOwnerOrAdmin(booking, currentUserId, isAdmin);
         return toResponseWithAvailability(booking);
     }
@@ -61,10 +61,10 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponse create(CreateBookingRequest request, Long currentUserId) {
         User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден: id=" + currentUserId));
+                .orElseThrow(() -> new NotFoundException("User not found: id=" + currentUserId));
 
         Event event = eventRepository.findByIdForUpdate(request.eventId())
-                .orElseThrow(() -> new NotFoundException("Мероприятие не найдено: id=" + request.eventId()));
+                .orElseThrow(() -> new NotFoundException("Event not found: id=" + request.eventId()));
 
         OffsetDateTime now = OffsetDateTime.now();
         int occupied = bookingRepository.sumOccupiedTickets(event.getId(), now);
@@ -72,7 +72,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (request.ticketCount() > available) {
             throw new ConflictException(
-                    "Недостаточно мест: запрошено " + request.ticketCount() + ", доступно " + available);
+                    "Not enough seats: requested " + request.ticketCount() + ", available " + available);
         }
 
         Booking booking = Booking.builder()
@@ -83,7 +83,7 @@ public class BookingServiceImpl implements BookingService {
                 .confirmed(false)
                 .build();
         Booking saved = bookingRepository.save(booking);
-        log.info("Создано бронирование id={} на событие id={} пользователем id={}",
+        log.info("Booking created id={} for event id={} by user id={}",
                 saved.getId(), event.getId(), currentUserId);
         return toResponseWithAvailability(saved);
     }
@@ -92,23 +92,23 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponse update(Long id, UpdateBookingRequest request, Long currentUserId, boolean isAdmin) {
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Бронирование не найдено: id=" + id));
+                .orElseThrow(() -> new NotFoundException("Booking not found: id=" + id));
         ensureOwnerOrAdmin(booking, currentUserId, isAdmin);
 
         if (request.ticketCount() != null) {
             Event event = eventRepository.findByIdForUpdate(booking.getEvent().getId())
-                    .orElseThrow(() -> new NotFoundException("Мероприятие не найдено"));
+                    .orElseThrow(() -> new NotFoundException("Event not found"));
             OffsetDateTime now = OffsetDateTime.now();
             int occupied = bookingRepository.sumOccupiedTickets(event.getId(), now);
             int occupiedByOthers = occupied - currentlyCounted(booking, now);
             int available = event.getTotalTickets() - occupiedByOthers;
             if (request.ticketCount() > available) {
                 throw new ConflictException(
-                        "Недостаточно мест: запрошено " + request.ticketCount() + ", доступно " + available);
+                        "Not enough seats: requested " + request.ticketCount() + ", available " + available);
             }
             booking.setTicketCount(request.ticketCount());
         }
-        log.info("Обновлено бронирование id={}", id);
+        log.info("Booking updated id={}", id);
         return toResponseWithAvailability(booking);
     }
 
@@ -116,10 +116,10 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public void delete(Long id, Long currentUserId, boolean isAdmin) {
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Бронирование не найдено: id=" + id));
+                .orElseThrow(() -> new NotFoundException("Booking not found: id=" + id));
         ensureOwnerOrAdmin(booking, currentUserId, isAdmin);
         bookingRepository.delete(booking);
-        log.info("Удалено бронирование id={}", id);
+        log.info("Booking deleted id={}", id);
     }
 
     @Override
@@ -143,15 +143,15 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public void confirm(Long id) {
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Бронирование не найдено: id=" + id));
+                .orElseThrow(() -> new NotFoundException("Booking not found: id=" + id));
         booking.setConfirmed(true);
-        log.info("Подтверждено бронирование id={}", id);
+        log.info("Booking confirmed id={}", id);
     }
 
 
     private void ensureOwnerOrAdmin(Booking booking, Long currentUserId, boolean isAdmin) {
         if (!isAdmin && !booking.getUser().getId().equals(currentUserId)) {
-            throw new AccessDeniedException("Нет доступа к чужому бронированию");
+            throw new AccessDeniedException("You cannot access another user's booking");
         }
     }
 

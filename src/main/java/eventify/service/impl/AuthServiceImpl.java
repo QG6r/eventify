@@ -29,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new ConflictException("Пользователь с таким email уже существует");
+            throw new ConflictException("A user with this email already exists");
         }
         User user = User.builder()
                 .email(request.email())
@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
                 .role(Role.USER)
                 .build();
         User saved = userRepository.save(user);
-        log.info("Зарегистрирован пользователь id={} email={}", saved.getId(), saved.getEmail());
+        log.info("User registered id={} email={}", saved.getId(), saved.getEmail());
         return new AuthResponse(jwtService.generateToken(saved), saved.getRole());
     }
 
@@ -45,11 +45,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new AuthenticationException("Неверное имя пользователя или пароль"));
+                .orElseThrow(() -> new AuthenticationException("Invalid username or password"));
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-            throw new AuthenticationException("Неверное имя пользователя или пароль");
+            throw new AuthenticationException("Invalid username or password");
         }
-        log.info("Вход пользователя id={}", user.getId());
+        log.info("User logged in id={}", user.getId());
         return new AuthResponse(jwtService.generateToken(user), user.getRole());
     }
 }

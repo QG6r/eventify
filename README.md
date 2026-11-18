@@ -14,7 +14,7 @@ Final project of the *Java Web Application Development* course (Skillbox).
 - Ticket booking with seat availability checks and **race-condition protection** (pessimistic locking, see below)
 - Booking management: view, change and cancel your own bookings
 - Admin panel: create, edit and delete events, list all bookings, confirm bookings
-- Notification settings per user (Telegram linking is groundwork only, no messages are sent yet)
+- Notification settings per user (new users get sensible defaults; Telegram linking is groundwork only, no messages are sent yet)
 - Uniform JSON error format and interactive API docs (Swagger UI)
 - Flyway database migrations and optional demo data
 
@@ -141,5 +141,4 @@ GitHub Actions (`.github/workflows/ci.yml`) builds and tests both the backend an
 ## Known limitations and next steps
 
 - Notifications are stored but not delivered (Telegram integration is a stub).
-- The UI text is currently in Russian.
 - Integration tests with a real PostgreSQL (Testcontainers) would be the next step for the booking concurrency logic.

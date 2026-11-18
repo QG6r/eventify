@@ -11,15 +11,15 @@ describe('App (unauthenticated)', () => {
   test('shows the login form for a visitor', async () => {
     render(<App />);
 
-    expect(await screen.findByText('Войти в аккаунт')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Войти' })).toBeInTheDocument();
+    expect(await screen.findByText('Sign in to your account')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
   });
 
   test('can switch from login to registration', async () => {
     render(<App />);
 
-    userEvent.click(await screen.findByText('Нет аккаунта? Зарегистрироваться'));
+    userEvent.click(await screen.findByText("Don't have an account? Sign up"));
 
-    expect(await screen.findByText('Создать аккаунт')).toBeInTheDocument();
+    expect(await screen.findByText('Create an account')).toBeInTheDocument();
   });
 });

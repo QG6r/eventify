@@ -18,7 +18,7 @@ const AdminBookingList: React.FC = () => {
     try {
       const pageable: Pageable = {
         page: 0,
-        size: 100, // Загружаем все мероприятия для dropdown
+        size: 100, // Load all events for the dropdown
         sort: ['title,asc']
       };
       
@@ -26,7 +26,7 @@ const AdminBookingList: React.FC = () => {
       setEvents(response.content);
     } catch (error) {
       console.error('Error loading events:', error);
-      toast.error('Ошибка при загрузке мероприятий');
+      toast.error('Failed to load events');
     }
   }, []);
 
@@ -44,7 +44,7 @@ const AdminBookingList: React.FC = () => {
       setTotalPages(response.totalPages);
     } catch (error) {
       console.error('Error loading bookings:', error);
-      toast.error('Ошибка при загрузке бронирований');
+      toast.error('Failed to load bookings');
     } finally {
       setLoading(false);
     }
@@ -61,31 +61,31 @@ const AdminBookingList: React.FC = () => {
   const handleConfirmBooking = async (bookingId: number) => {
     try {
       await apiService.confirmBooking(bookingId);
-      toast.success('Бронирование подтверждено');
+      toast.success('Booking confirmed');
       loadBookings();
     } catch (error) {
       console.error('Error confirming booking:', error);
-      toast.error('Ошибка при подтверждении бронирования');
+      toast.error('Failed to confirm booking');
     }
   };
 
   const handleDeleteBooking = async (bookingId: number) => {
-    if (!window.confirm('Удалить это бронирование?')) {
+    if (!window.confirm('Delete this booking?')) {
       return;
     }
 
     try {
       await apiService.deleteAdminBooking(bookingId);
-      toast.success('Бронирование удалено');
+      toast.success('Booking deleted');
       loadBookings();
     } catch (error) {
       console.error('Error deleting booking:', error);
-      toast.error('Ошибка при удалении бронирования');
+      toast.error('Failed to delete booking');
     }
   };
 
   const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString('ru-RU', {
+    return new Date(dateTime).toLocaleString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -98,12 +98,12 @@ const AdminBookingList: React.FC = () => {
     return confirmed ? (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
         <Check className="w-3 h-3 mr-1" />
-        Подтверждено
+        Confirmed
       </span>
     ) : (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
         <X className="w-3 h-3 mr-1" />
-        Ожидает подтверждения
+        Awaiting confirmation
       </span>
     );
   };
@@ -119,7 +119,7 @@ const AdminBookingList: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Управление бронированиями</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Manage bookings</h1>
       </div>
 
       {/* Filters */}
@@ -127,14 +127,14 @@ const AdminBookingList: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Мероприятие
+              Event
             </label>
             <select
               value={selectedEventId || ''}
               onChange={(e) => setSelectedEventId(e.target.value ? parseInt(e.target.value) : undefined)}
               className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             >
-              <option value="">Все мероприятия</option>
+              <option value="">All events</option>
               {events.map((event) => (
                 <option key={event.id} value={event.id}>
                   {event.title}
@@ -152,7 +152,7 @@ const AdminBookingList: React.FC = () => {
                 className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
               <span className="ml-2 text-sm text-gray-700">
-                Только неподтвержденные
+                Unconfirmed only
               </span>
             </label>
           </div>
@@ -165,7 +165,7 @@ const AdminBookingList: React.FC = () => {
               }}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
-              Сбросить фильтры
+              Reset filters
             </button>
           </div>
         </div>
@@ -174,9 +174,9 @@ const AdminBookingList: React.FC = () => {
       {bookings.length === 0 ? (
         <div className="text-center py-12">
           <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Нет бронирований</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No bookings</h3>
           <p className="mt-1 text-sm text-gray-500">
-            По выбранным критериям бронирования не найдены.
+            No bookings match the selected filters.
           </p>
         </div>
       ) : (
@@ -203,15 +203,15 @@ const AdminBookingList: React.FC = () => {
                           <div className="mt-1 flex items-center text-sm text-gray-500">
                             <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4" />
                             <p>
-                              {booking.event.title} • {booking.ticketCount} билетов
+                              {booking.event.title} • {booking.ticketCount} tickets
                             </p>
                           </div>
                           <div className="mt-1 text-sm text-gray-500">
-                            Создано: {formatDateTime(booking.createdAt)}
+                            Created: {formatDateTime(booking.createdAt)}
                           </div>
                           {booking.expiryTime && !booking.confirmed && (
                             <div className="mt-1 text-sm text-red-500">
-                              Истекает: {formatDateTime(booking.expiryTime)}
+                              Expires: {formatDateTime(booking.expiryTime)}
                             </div>
                           )}
                         </div>
@@ -222,7 +222,7 @@ const AdminBookingList: React.FC = () => {
                           <button
                             onClick={() => handleConfirmBooking(booking.id)}
                             className="inline-flex items-center p-2 border border-transparent text-sm leading-4 font-medium rounded-md text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                            title="Подтвердить"
+                            title="Confirm"
                           >
                             <Check className="w-4 h-4" />
                           </button>
@@ -231,7 +231,7 @@ const AdminBookingList: React.FC = () => {
                         <button
                           onClick={() => handleDeleteBooking(booking.id)}
                           className="inline-flex items-center p-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                          title="Удалить"
+                          title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -252,7 +252,7 @@ const AdminBookingList: React.FC = () => {
                   disabled={currentPage === 0}
                   className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Предыдущая
+                  Previous
                 </button>
                 
                 {Array.from({ length: totalPages }, (_, i) => (
@@ -274,7 +274,7 @@ const AdminBookingList: React.FC = () => {
                   disabled={currentPage === totalPages - 1}
                   className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Следующая
+                  Next
                 </button>
               </nav>
             </div>

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
 
-@Tag(name = "Events", description = "Управление мероприятиями")
+@Tag(name = "Events", description = "Event management")
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
@@ -20,7 +20,7 @@ public class EventController {
 
     private final EventService eventService;
 
-    @Operation(summary = "Получить список мероприятий")
+    @Operation(summary = "List events")
     @GetMapping
     public PageResponse<EventResponse> list(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
@@ -29,7 +29,7 @@ public class EventController {
         return eventService.list(from, to, pageable);
     }
 
-    @Operation(summary = "Получить мероприятие по ID")
+    @Operation(summary = "Get event by ID")
     @GetMapping("/{id}")
     public EventResponse getById(@PathVariable Long id) {
         return eventService.getById(id);

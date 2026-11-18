@@ -26,7 +26,7 @@ const EventDetail: React.FC = () => {
       setEvent(eventData);
     } catch (error) {
       console.error('Error loading event:', error);
-      toast.error('Ошибка при загрузке мероприятия');
+      toast.error('Failed to load event');
       navigate('/events');
     } finally {
       setLoading(false);
@@ -41,7 +41,7 @@ const EventDetail: React.FC = () => {
     if (!event || !user) return;
 
     if (ticketCount > event.availableTickets) {
-      toast.error('Недостаточно доступных билетов');
+      toast.error('Not enough tickets available');
       return;
     }
 
@@ -57,13 +57,13 @@ const EventDetail: React.FC = () => {
       if (booking.expiryTime) {
         setExpiryTime(booking.expiryTime);
         setShowBookingTimer(true);
-        toast.success(`Бронирование создано! У вас есть время до ${new Date(booking.expiryTime).toLocaleString('ru-RU')} для подтверждения.`);
+        toast.success(`Booking created! You have until ${new Date(booking.expiryTime).toLocaleString('en-US')} to confirm it.`);
       } else {
-        toast.success('Бронирование создано!');
+        toast.success('Booking created!');
         navigate('/bookings');
       }
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Ошибка при создании бронирования';
+      const message = error.response?.data?.message || 'Failed to create booking';
       toast.error(message);
     } finally {
       setBookingLoading(false);
@@ -71,7 +71,7 @@ const EventDetail: React.FC = () => {
   };
 
   const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString('ru-RU', {
+    return new Date(dateTime).toLocaleString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -88,9 +88,9 @@ const EventDetail: React.FC = () => {
   };
 
   const getStatusText = (availableTickets: number, totalTickets: number) => {
-    if (availableTickets === 0) return 'Мест нет';
-    if (availableTickets <= totalTickets * 0.25) return 'Осталось мало мест';
-    return 'Места доступны';
+    if (availableTickets === 0) return 'Sold out';
+    if (availableTickets <= totalTickets * 0.25) return 'Few seats left';
+    return 'Seats available';
   };
 
   if (loading) {
@@ -104,7 +104,7 @@ const EventDetail: React.FC = () => {
   if (!event) {
     return (
       <div className="text-center py-12">
-        <h3 className="text-lg font-medium text-gray-900">Мероприятие не найдено</h3>
+        <h3 className="text-lg font-medium text-gray-900">Event not found</h3>
       </div>
     );
   }
@@ -117,7 +117,7 @@ const EventDetail: React.FC = () => {
           className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Назад к мероприятиям
+          Back to events
         </button>
       </div>
 
@@ -137,12 +137,12 @@ const EventDetail: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Описание</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
               <p className="text-gray-600 leading-relaxed">{event.description}</p>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Информация</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Information</h2>
               <div className="space-y-4">
                 <div className="flex items-center text-gray-600">
                   <Calendar className="w-5 h-5 mr-3" />
@@ -152,7 +152,7 @@ const EventDetail: React.FC = () => {
                 <div className="flex items-center text-gray-600">
                   <Users className="w-5 h-5 mr-3" />
                   <span className={getStatusColor(event.availableTickets, event.totalTickets)}>
-                    {event.availableTickets} из {event.totalTickets} мест
+                    {event.availableTickets} of {event.totalTickets} seats
                   </span>
                 </div>
 
@@ -164,11 +164,11 @@ const EventDetail: React.FC = () => {
 
               {user && event.availableTickets > 0 && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Забронировать билеты</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Book tickets</h3>
                   
                   <div className="flex items-center space-x-4 mb-4">
                     <label htmlFor="ticketCount" className="text-sm font-medium text-gray-700">
-                      Количество:
+                      Quantity:
                     </label>
                     <select
                       id="ticketCount"
@@ -189,7 +189,7 @@ const EventDetail: React.FC = () => {
                     disabled={bookingLoading || event.availableTickets === 0}
                     className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                   >
-                    {bookingLoading ? 'Загрузка...' : 'Забронировать'}
+                    {bookingLoading ? 'Loading...' : 'Book'}
                   </button>
                 </div>
               )}
@@ -197,7 +197,7 @@ const EventDetail: React.FC = () => {
               {!user && (
                 <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-yellow-800">
-                    Для бронирования билетов необходимо войти в систему.
+                    Please log in to book tickets.
                   </p>
                 </div>
               )}
@@ -205,7 +205,7 @@ const EventDetail: React.FC = () => {
               {event.availableTickets === 0 && (
                 <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-red-800">
-                    К сожалению, все билеты уже забронированы.
+                    Sorry, all tickets have been booked.
                   </p>
                 </div>
               )}
@@ -217,7 +217,7 @@ const EventDetail: React.FC = () => {
               <div className="flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-blue-600" />
                 <span className="text-blue-800">
-                  Время на подтверждение бронирования: {new Date(expiryTime).toLocaleString('ru-RU')}
+                  Confirm by: {new Date(expiryTime).toLocaleString('en-US')}
                 </span>
               </div>
             </div>

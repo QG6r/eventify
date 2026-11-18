@@ -35,17 +35,17 @@ const NotificationSettings: React.FC = () => {
     try {
       setSaving(true);
       await apiService.updateNotificationPreferences(preferences);
-      toast.success('Настройки уведомлений сохранены');
+      toast.success('Notification settings saved');
     } catch (error) {
       console.error('Error saving preferences:', error);
-      toast.error('Ошибка при сохранении настроек');
+      toast.error('Failed to save settings');
     } finally {
       setSaving(false);
     }
   };
 
   const handleReset = async () => {
-    if (!window.confirm('Сбросить все настройки уведомлений?')) {
+    if (!window.confirm('Reset all notification settings?')) {
       return;
     }
 
@@ -57,10 +57,10 @@ const NotificationSettings: React.FC = () => {
         notifyUpcoming: false,
         notifyBeforeHours: 24,
       });
-      toast.success('Настройки уведомлений сброшены');
+      toast.success('Notification settings reset');
     } catch (error) {
       console.error('Error resetting preferences:', error);
-      toast.error('Ошибка при сбросе настроек');
+      toast.error('Failed to reset settings');
     } finally {
       setSaving(false);
     }
@@ -70,10 +70,10 @@ const NotificationSettings: React.FC = () => {
     try {
       const code = await apiService.linkTelegram();
       setTelegramCode(code);
-      toast.success('Код для привязки Telegram получен');
+      toast.success('Telegram link code received');
     } catch (error) {
       console.error('Error linking telegram:', error);
-      toast.error('Ошибка при получении кода для Telegram');
+      toast.error('Failed to get Telegram code');
     }
   };
 
@@ -95,9 +95,9 @@ const NotificationSettings: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Настройки уведомлений</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Notification settings</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Настройте, какие уведомления вы хотите получать
+          Choose which notifications you want to receive
         </p>
       </div>
 
@@ -105,23 +105,23 @@ const NotificationSettings: React.FC = () => {
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-medium text-gray-900 flex items-center">
             <Bell className="w-5 h-5 mr-2" />
-            Настройки уведомлений
+            Notification settings
           </h2>
         </div>
 
         <div className="px-6 py-4 space-y-6">
           {/* Email Notifications */}
           <div>
-            <h3 className="text-md font-medium text-gray-900 mb-4">Email уведомления</h3>
+            <h3 className="text-md font-medium text-gray-900 mb-4">Email notifications</h3>
             
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    Уведомления о новых мероприятиях
+                    New event notifications
                   </label>
                   <p className="text-sm text-gray-500">
-                    Получать уведомления когда добавляются новые мероприятия
+                    Get notified when new events are added
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -138,10 +138,10 @@ const NotificationSettings: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    Напоминания о предстоящих мероприятиях
+                    Upcoming event reminders
                   </label>
                   <p className="text-sm text-gray-500">
-                    Получать напоминания о ваших забронированных мероприятиях
+                    Get reminders about events you have booked
                   </p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -158,7 +158,7 @@ const NotificationSettings: React.FC = () => {
               {preferences.notifyUpcoming && (
                 <div className="ml-6">
                   <label htmlFor="notifyBeforeHours" className="block text-sm font-medium text-gray-700 mb-2">
-                    Напоминать за (часов):
+                    Remind me (hours before):
                   </label>
                   <select
                     id="notifyBeforeHours"
@@ -181,25 +181,25 @@ const NotificationSettings: React.FC = () => {
           <div className="border-t border-gray-200 pt-6">
             <h3 className="text-md font-medium text-gray-900 mb-4 flex items-center">
               <MessageCircle className="w-5 h-5 mr-2" />
-              Интеграция с Telegram
+              Telegram integration
             </h3>
             
             <div className="space-y-4">
               <p className="text-sm text-gray-600">
-                Привяжите ваш Telegram аккаунт для получения уведомлений в мессенджере
+                Link your Telegram account to receive notifications in the messenger
               </p>
               
               <button
                 onClick={handleLinkTelegram}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Привязать Telegram
+                Link Telegram
               </button>
 
               {telegramCode && (
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-800 mb-2">
-                    Отправьте этот код боту @your_bot_name:
+                    Send this code to the bot @your_bot_name:
                   </p>
                   <div className="bg-white p-3 rounded border font-mono text-lg text-center">
                     {telegramCode}
@@ -217,7 +217,7 @@ const NotificationSettings: React.FC = () => {
             className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            Сбросить настройки
+            Reset settings
           </button>
           
           <button
@@ -226,7 +226,7 @@ const NotificationSettings: React.FC = () => {
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
             <Save className="w-4 h-4 mr-2" />
-            {saving ? 'Сохранение...' : 'Сохранить'}
+            {saving ? 'Saving...' : 'Save'}
           </button>
         </div>
       </div>

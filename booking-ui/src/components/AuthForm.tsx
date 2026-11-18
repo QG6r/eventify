@@ -11,8 +11,8 @@ interface AuthFormData {
 }
 
 const schema = yup.object({
-  email: yup.string().email('Введите корректный email').required('Email обязателен'),
-  password: yup.string().min(8, 'Пароль должен содержать минимум 8 символов').required('Пароль обязателен'),
+  email: yup.string().email('Enter a valid email').required('Email is required'),
+  password: yup.string().min(8, 'Password must be at least 8 characters').required('Password is required'),
 });
 
 const AuthForm: React.FC = () => {
@@ -34,13 +34,13 @@ const AuthForm: React.FC = () => {
     try {
       if (isLogin) {
         await login(data.email, data.password);
-        toast.success('Успешный вход!');
+        toast.success('Signed in successfully!');
       } else {
         await register(data.email, data.password);
-        toast.success('Регистрация успешна!');
+        toast.success('Registration successful!');
       }
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Произошла ошибка';
+      const message = error.response?.data?.message || 'Something went wrong';
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -57,7 +57,7 @@ const AuthForm: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isLogin ? 'Войти в аккаунт' : 'Создать аккаунт'}
+            {isLogin ? 'Sign in to your account' : 'Create an account'}
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -82,7 +82,7 @@ const AuthForm: React.FC = () => {
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
-                Пароль
+                Password
               </label>
               <input
                 {...registerField('password')}
@@ -92,7 +92,7 @@ const AuthForm: React.FC = () => {
                 autoComplete="current-password"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Пароль"
+                placeholder="Password"
               />
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
@@ -106,7 +106,7 @@ const AuthForm: React.FC = () => {
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {isLoading ? 'Загрузка...' : isLogin ? 'Войти' : 'Зарегистрироваться'}
+              {isLoading ? 'Loading...' : isLogin ? 'Sign in' : 'Sign up'}
             </button>
           </div>
 
@@ -116,7 +116,7 @@ const AuthForm: React.FC = () => {
               onClick={toggleMode}
               className="text-indigo-600 hover:text-indigo-500 text-sm"
             >
-              {isLogin ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
+              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
             </button>
           </div>
         </form>
