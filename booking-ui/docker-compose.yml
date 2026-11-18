@@ -3,11 +3,12 @@
 services:
   # 1. Frontend in Docker with mock data (demo)
   frontend-mocks:
-    build: .
+    build:
+      context: .
+      args:
+        REACT_APP_USE_MOCKS: "true"
     ports:
       - "3000:80"
-    environment:
-      - REACT_APP_USE_MOCKS=true
     profiles:
       - docker-mocks
     healthcheck:
@@ -18,12 +19,14 @@ services:
 
   # 2. Frontend in Docker with a real backend (port 8080 must be free)
   frontend-backend:
-    build: .
+    build:
+      context: .
+      args:
+        # The URL is used by the browser, not by the container, so it is localhost
+        REACT_APP_API_URL: http://localhost:8080
+        REACT_APP_USE_MOCKS: "false"
     ports:
       - "3000:80"
-    environment:
-      - REACT_APP_API_URL=http://host.docker.internal:8080
-      - REACT_APP_USE_MOCKS=false
     profiles:
       - docker-backend
     healthcheck:

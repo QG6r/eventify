@@ -16,6 +16,13 @@ import {
 } from '../types';
 import { mockApiService } from './mockApi';
 
+// Spring Data expects page, size and repeated sort parameters (not a JSON blob)
+const appendPageable = (params: URLSearchParams, pageable: Pageable): void => {
+  params.append('page', String(pageable.page));
+  params.append('size', String(pageable.size));
+  (pageable.sort ?? []).forEach((s) => params.append('sort', s));
+};
+
 class ApiService {
   private api: any;
   private baseURL: string;
@@ -88,7 +95,7 @@ class ApiService {
       return mockApiService.getEvents(pageable, from, to);
     }
     const params = new URLSearchParams();
-    params.append('pageable', JSON.stringify(pageable));
+    appendPageable(params, pageable);
     if (from) params.append('from', from);
     if (to) params.append('to', to);
     
@@ -166,7 +173,7 @@ class ApiService {
       return mockApiService.getAdminBookings(pageable, eventId, unconfirmedOnly);
     }
     const params = new URLSearchParams();
-    params.append('pageable', JSON.stringify(pageable));
+    appendPageable(params, pageable);
     if (eventId) params.append('eventId', eventId.toString());
     if (unconfirmedOnly !== undefined) params.append('unconfirmedOnly', unconfirmedOnly.toString());
     
