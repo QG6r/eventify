@@ -1,100 +1,145 @@
-# Eventify — сервис бронирования билетов на мероприятия
+# Eventify — event ticket booking service
 
-REST API для системы бронирования билетов: пользователи просматривают мероприятия и бронируют места, администраторы управляют мероприятиями и подтверждают брони.
+[![CI](https://github.com/QG6r/eventify/actions/workflows/ci.yml/badge.svg)](https://github.com/QG6r/eventify/actions/workflows/ci.yml)
 
-Финальная работа курса «Разработка веб-приложений на Java».
+A full-stack ticket booking application. Users browse events and book seats; administrators manage events and confirm bookings.
+The backend is a Spring Boot REST API with PostgreSQL; the frontend is a React + TypeScript single-page app (`booking-ui`).
 
-## Стек технологий
+Final project of the *Java Web Application Development* course (Skillbox).
 
-- **Java 21**, **Spring Boot 3.3**
-- **Spring Data JPA** (Hibernate) — доступ к данным
-- **PostgreSQL 16** — база данных
-- **Flyway** — миграции схемы БД
-- **Spring Security + JWT** — аутентификация и роли
-- **MapStruct** — маппинг сущностей в DTO
-- **springdoc-openapi (Swagger UI)** — документация API
-- **JUnit 5 + Mockito** — юнит-тесты
-- **Gradle** — сборка
-- **Docker / Docker Compose** — контейнеризация
+## Features
 
-## Возможности
+- Registration and login with **JWT** authentication, roles `USER` and `ADMIN`
+- Event catalogue with pagination and date filtering
+- Ticket booking with seat availability checks and **race-condition protection** (pessimistic locking, see below)
+- Booking management: view, change and cancel your own bookings
+- Admin panel: create, edit and delete events, list all bookings, confirm bookings
+- Notification settings per user (Telegram linking is groundwork only, no messages are sent yet)
+- Uniform JSON error format and interactive API docs (Swagger UI)
+- Flyway database migrations and optional demo data
 
-- Регистрация и вход по JWT
-- Просмотр мероприятий с пагинацией и фильтром по датам
-- Бронирование билетов с проверкой доступных мест и защитой от гонки (пессимистичная блокировка)
-- Управление своими бронированиями
-- Роли USER и ADMIN: администратор управляет мероприятиями и подтверждает брони
-- Настройки уведомлений, заготовка привязки Telegram
-- Единый формат ошибок, документация Swagger
+## Tech stack
 
-## Роли и доступ
+| Area | Technology |
+|---|---|
+| Backend | Java 21, Spring Boot 3.3, Spring Web, Spring Data JPA (Hibernate), Spring Security |
+| Database | PostgreSQL 16, Flyway migrations |
+| Auth | JWT (jjwt), BCrypt password hashing |
+| Mapping / docs | MapStruct, springdoc-openapi (Swagger UI) |
+| Tests | JUnit 5, Mockito, AssertJ |
+| Frontend | React 19, TypeScript, React Router, React Hook Form + Yup, Axios, Tailwind CSS |
+| Build / run | Gradle, Docker, Docker Compose, GitHub Actions CI |
 
-- **USER** — просмотр мероприятий, свои бронирования, настройки уведомлений
-- **ADMIN** — создание/редактирование/удаление мероприятий, просмотр и подтверждение всех броней
+## Quick demo
 
-Администратор по умолчанию создаётся при первом запуске:
-- email: `admin@eventify.local`
-- пароль: `admin12345` (только для демо-запуска; для реального окружения замените)
+### Option 1 — frontend only, no backend needed (fastest)
 
-## Запуск через Docker (рекомендуется)
-
-Требуется установленный Docker и Docker Compose.
-
-1. Клонируйте бэкенд и фронтенд. Фронтенд (`booking-ui`) должен лежать в подпапке `booking-ui` внутри проекта.
-
-2. Создайте файл `.env` из шаблона и при желании поменяйте значения (пароль БД, секрет JWT):
+The frontend ships with a built-in mock API, so the UI can be shown without a database.
 
 ```bash
-   cp .env.example .env
+cd booking-ui
+npm ci
+npm run start:mocks      # http://localhost:3000
 ```
 
+Mock accounts: `user@example.com` / `password123` and `admin@example.com` / `password123`.
 
-3. Запустите всё одной командой:
+### Option 2 — full stack with Docker (recommended)
+
+Requires Docker and Docker Compose.
 
 ```bash
-   docker compose up -d --build
+cp .env.example .env
+docker compose up -d --build
 ```
 
-4. Доступ:
-    - Фронтенд: http://localhost:3000
-    - Swagger UI: http://localhost:8080/swagger-ui.html
-    - PostgreSQL: localhost:5433
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| PostgreSQL | localhost:5433 |
 
-При первом запуске Flyway автоматически создаёт таблицы и администратора.
+The first start applies all Flyway migrations and loads **demo data** (six upcoming events and one demo booking).
 
-Остановить: `docker compose down` (данные сохранятся) или `docker compose down -v` (с очисткой БД).
+| Account | Email | Password | Role |
+|---|---|---|---|
+| Administrator | `admin@eventify.local` | `admin12345` | ADMIN |
+| Demo user | `demo@eventify.local` | `demo12345` | USER |
 
-## Локальный запуск (без Docker для приложения)
+These credentials are for demonstration only. For a real deployment, change them and set a strong `JWT_SECRET`.
 
-1. Поднимите только базу:
+To start without demo data, add `FLYWAY_LOCATIONS=classpath:db/migration` to `.env`. To reset the database completely: `docker compose down -v`.
+
+### Option 3 — backend from the IDE or Gradle
 
 ```bash
-   docker compose up -d db
+docker compose up -d db          # only the database
+./gradlew bootRun                # connects to localhost:5433 using the defaults from application.yml
 ```
 
-2. Запустите приложение из IDE (класс `EventifyApplication`) или командой:
+## How booking works
+
+1. A user creates a booking for an event. The seats are held until `expiryTime` (default 30 minutes, configurable with `BOOKING_EXPIRY_MINUTES`).
+2. An administrator confirms the booking; confirmed bookings keep their seats permanently.
+3. Seats of unconfirmed bookings whose hold has expired are released automatically: availability is calculated from confirmed bookings plus bookings that have not expired yet.
+4. When creating or changing a booking, the event row is read with a **pessimistic write lock** (`PESSIMISTIC_WRITE`). Two users cannot take the last seats at the same time: the second request waits for the first transaction and then sees the updated availability (and receives a `409 Conflict` if there are not enough seats).
+
+## API overview
+
+Full interactive documentation is available at `/swagger-ui.html`.
+
+| Area | Endpoints | Access |
+|---|---|---|
+| Auth | `POST /auth/register`, `POST /auth/login` | public |
+| Events | `GET /events`, `GET /events/{id}` | public |
+| Bookings | `GET /bookings`, `POST /bookings`, `GET/PUT/DELETE /bookings/{id}` | authenticated (own bookings) |
+| User settings | `GET/PUT/DELETE /user/notifications`, `POST /user/telegram/link` | authenticated |
+| Admin | `POST /admin/events`, `PUT/DELETE /admin/events/{id}`, `GET /admin/bookings`, `PUT /admin/bookings/{id}/confirm`, `DELETE /admin/bookings/{id}` | `ADMIN` |
+
+## Project structure
+
+```
+src/main/java/eventify/
+├── controller/    REST controllers
+├── service/       business logic (interfaces) and service/impl (implementations)
+├── repository/    Spring Data JPA repositories
+├── entity/        JPA entities (User, Event, Booking, NotificationPreferences)
+├── dto/           request/response objects
+├── mapper/        MapStruct mappers
+├── security/      JWT service and filter, user details
+├── config/        Spring Security, OpenAPI, JWT properties
+└── exception/     custom exceptions and the global error handler
+src/main/resources/
+├── application.yml
+└── db/
+    ├── migration/ Flyway migrations V1..V7 (schema, admin account)
+    └── demo/      optional demo data (V100)
+booking-ui/        React + TypeScript frontend
+```
+
+## Configuration
+
+Environment variables (see `.env.example`):
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | database credentials (Docker Compose) | see `.env.example` |
+| `JWT_SECRET` | key used to sign tokens, at least 32 bytes | development value, **change it** |
+| `JWT_EXPIRATION_MS` | token lifetime | 86400000 (24 h) |
+| `BOOKING_EXPIRY_MINUTES` | how long unconfirmed bookings hold seats | 30 |
+| `FLYWAY_LOCATIONS` | set to `classpath:db/migration` to skip demo data | migrations + demo |
+
+## Tests and CI
 
 ```bash
-   ./gradlew bootRun
+./gradlew test                        # backend: service-layer unit tests and JWT tests
+cd booking-ui && npm test -- --watchAll=false   # frontend tests
 ```
 
-Приложение подключится к БД на `localhost:5433` (значения по умолчанию из `application.yml`).
+GitHub Actions (`.github/workflows/ci.yml`) builds and tests both the backend and the frontend on every push and pull request.
 
-## Тесты
+## Known limitations and next steps
 
-```bash
-./gradlew test
-```
-
-## Структура проекта
-
-- `entity` — JPA-сущности
-- `repository` — репозитории Spring Data
-- `dto` — объекты передачи данных
-- `mapper` — MapStruct-мапперы
-- `service` — бизнес-логика (интерфейсы + реализации)
-- `controller` — REST-контроллеры
-- `security` — JWT, фильтр аутентификации, текущий пользователь
-- `config` — конфигурация Spring Security, OpenAPI
-- `exception` — свои исключения и глобальный обработчик
-- `resources/db/migration` — миграции Flyway
+- Notifications are stored but not delivered (Telegram integration is a stub).
+- The UI text is currently in Russian.
+- Integration tests with a real PostgreSQL (Testcontainers) would be the next step for the booking concurrency logic.

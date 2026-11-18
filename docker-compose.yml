@@ -33,6 +33,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
       BOOKING_EXPIRY_MINUTES: ${BOOKING_EXPIRY_MINUTES}
+      # Demo data is loaded by default; set FLYWAY_LOCATIONS=classpath:db/migration in .env to disable it
+      FLYWAY_LOCATIONS: ${FLYWAY_LOCATIONS:-classpath:db/migration,classpath:db/demo}
     ports:
       - "8080:8080"
     networks:

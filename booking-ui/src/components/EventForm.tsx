@@ -27,7 +27,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(false);
-  const [event, setEvent] = useState<Event | null>(null);
+  const [, setEvent] = useState<Event | null>(null);
 
   const {
     register,
@@ -42,6 +42,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
     if (mode === 'edit' && id) {
       loadEvent();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, id]);
 
   const loadEvent = async () => {
