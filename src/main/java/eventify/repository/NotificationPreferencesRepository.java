@@ -9,6 +9,6 @@ public interface NotificationPreferencesRepository extends JpaRepository<Notific
 
     Optional<NotificationPreferences> findByUserId(Long userId);
 
-    // Бот ищет пользователя по разовому коду привязки при команде /start.
+    // The bot looks up a user by a one-time link code when it receives the /start command.
     Optional<NotificationPreferences> findByTelegramLinkCode(String telegramLinkCode);
 }

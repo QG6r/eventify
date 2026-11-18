@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Auth", description = "Аутентификация и регистрация")
+@Tag(name = "Auth", description = "Authentication and registration")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -20,14 +20,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "Регистрация пользователя")
+    @Operation(summary = "Register user")
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 
-    @Operation(summary = "Вход в систему")
+    @Operation(summary = "Log in")
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);

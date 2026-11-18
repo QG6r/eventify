@@ -15,7 +15,7 @@ const BookingList: React.FC = () => {
       setBookings(bookingsData);
     } catch (error) {
       console.error('Error loading bookings:', error);
-      toast.error('Ошибка при загрузке бронирований');
+      toast.error('Failed to load bookings');
     } finally {
       setLoading(false);
     }
@@ -26,22 +26,22 @@ const BookingList: React.FC = () => {
   }, [loadBookings]);
 
   const handleDeleteBooking = async (bookingId: number, eventTitle: string, ticketCount: number) => {
-    if (!window.confirm(`Отменить вашу бронь на ${ticketCount} билетов?`)) {
+    if (!window.confirm(`Cancel your booking for ${ticketCount} tickets?`)) {
       return;
     }
 
     try {
       await apiService.deleteBooking(bookingId);
-      toast.success('Бронирование отменено');
+      toast.success('Booking cancelled');
       loadBookings();
     } catch (error) {
       console.error('Error deleting booking:', error);
-      toast.error('Ошибка при отмене бронирования');
+      toast.error('Failed to cancel booking');
     }
   };
 
   const formatDateTime = (dateTime: string) => {
-    return new Date(dateTime).toLocaleString('ru-RU', {
+    return new Date(dateTime).toLocaleString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -54,12 +54,12 @@ const BookingList: React.FC = () => {
     return confirmed ? (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
         <Check className="w-3 h-3 mr-1" />
-        Подтверждено
+        Confirmed
       </span>
     ) : (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
         <X className="w-3 h-3 mr-1" />
-        Ожидает подтверждения
+        Awaiting confirmation
       </span>
     );
   };
@@ -75,15 +75,15 @@ const BookingList: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Мои бронирования</h1>
+        <h1 className="text-3xl font-bold text-gray-900">My bookings</h1>
       </div>
 
       {bookings.length === 0 ? (
         <div className="text-center py-12">
           <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Нет бронирований</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">No bookings</h3>
           <p className="mt-1 text-sm text-gray-500">
-            У вас пока нет забронированных билетов.
+            You have no bookings yet.
           </p>
         </div>
       ) : (
@@ -113,16 +113,16 @@ const BookingList: React.FC = () => {
                           </div>
                           <div className="flex items-center">
                             <Users className="w-4 h-4 mr-1" />
-                            {booking.ticketCount} билетов
+                            {booking.ticketCount} tickets
                           </div>
                           <div className="flex items-center">
                             <Clock className="w-4 h-4 mr-1" />
-                            Создано: {formatDateTime(booking.createdAt)}
+                            Created: {formatDateTime(booking.createdAt)}
                           </div>
                         </div>
                         {booking.expiryTime && !booking.confirmed && (
                           <div className="mt-2 text-sm text-orange-600">
-                            Время на подтверждение: {formatDateTime(booking.expiryTime)}
+                            Confirm by: {formatDateTime(booking.expiryTime)}
                           </div>
                         )}
                       </div>
@@ -132,7 +132,7 @@ const BookingList: React.FC = () => {
                         <button
                           onClick={() => handleDeleteBooking(booking.id, booking.event.title, booking.ticketCount)}
                           className="inline-flex items-center p-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                          title="Отменить бронирование"
+                          title="Cancel booking"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

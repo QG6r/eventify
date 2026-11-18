@@ -18,7 +18,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Eventify API")
-                        .description("Приложение по бронированию билетов на мероприятия")
+                        .description("Event ticket booking application")
                         .version("v0"))
                 .addSecurityItem(new SecurityRequirement().addList(SCHEME_NAME))
                 .components(new Components().addSecuritySchemes(SCHEME_NAME,

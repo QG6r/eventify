@@ -1,31 +1,31 @@
 @echo off
-echo 🚀 Запуск Event Booking Frontend в Docker с бэкендом...
+echo 🚀 Starting Event Booking Frontend in Docker with a backend...
 
-REM Проверяем, установлен ли Docker
+REM Check that Docker is installed
 docker --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Docker не установлен. Установите Docker с https://docs.docker.com/get-docker/
+    echo ❌ Docker is not installed. Install Docker from https://docs.docker.com/get-docker/
     pause
     exit /b 1
 )
 
-REM Проверяем, установлен ли Docker Compose
+REM Check that Docker Compose is installed
 docker-compose --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Docker Compose не установлен. Установите Docker Compose с https://docs.docker.com/compose/install/
+    echo ❌ Docker Compose is not installed. Install Docker Compose from https://docs.docker.com/compose/install/
     pause
     exit /b 1
 )
 
-REM Останавливаем существующие контейнеры
-echo 🛑 Остановка существующих контейнеров...
+REM Stop existing containers
+echo 🛑 Stopping existing containers...
 docker-compose down
 
-REM Запускаем с бэкендом
-echo 🐳 Запуск с бэкендом...
+REM Start with the backend
+echo 🐳 Starting with the backend...
 docker-compose --profile docker-backend up --build
 
-echo ✅ Приложение запущено!
-echo 🌐 Фронтенд: http://localhost:3000
-echo 🔧 Бэкенд: http://localhost:8080
+echo ✅ Application started!
+echo 🌐 Frontend: http://localhost:3000
+echo 🔧 Backend: http://localhost:8080
 pause 

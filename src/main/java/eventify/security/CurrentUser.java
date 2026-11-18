@@ -20,7 +20,7 @@ public class CurrentUser {
     private AppUserDetails details() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof AppUserDetails userDetails)) {
-            throw new AuthenticationException("Пользователь не аутентифицирован");
+            throw new AuthenticationException("User is not authenticated");
         }
         return userDetails;
     }

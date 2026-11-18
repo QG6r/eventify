@@ -1,8 +1,8 @@
 #!/bin/bash
 
-echo "🛑 Остановка Docker контейнеров..."
+echo "🛑 Stopping Docker containers..."
 
-# Останавливаем все контейнеры
+# Stop all containers
 docker-compose down
 
-echo "✅ Контейнеры остановлены!" 
+echo "✅ Containers stopped!" 

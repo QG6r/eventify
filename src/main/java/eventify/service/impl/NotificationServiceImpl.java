@@ -19,15 +19,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
+    /** Values returned for a user who has not saved any notification settings yet (match the DB column defaults). */
+    static final NotificationPreferencesDto DEFAULT_PREFERENCES = new NotificationPreferencesDto(false, false, 1);
+
     private final NotificationPreferencesRepository prefsRepository;
     private final UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
     public NotificationPreferencesDto get(Long currentUserId) {
-        NotificationPreferences prefs = prefsRepository.findByUserId(currentUserId)
-                .orElseThrow(() -> new NotFoundException("Настройки уведомлений не найдены"));
-        return toDto(prefs);
+        return prefsRepository.findByUserId(currentUserId)
+                .map(this::toDto)
+                .orElse(DEFAULT_PREFERENCES);
     }
 
     @Override
@@ -36,7 +39,7 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationPreferences prefs = prefsRepository.findByUserId(currentUserId)
                 .orElseGet(() -> {
                     User user = userRepository.findById(currentUserId)
-                            .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+                            .orElseThrow(() -> new NotFoundException("User not found"));
                     NotificationPreferences np = new NotificationPreferences();
                     np.setUser(user);
                     return np;
@@ -47,7 +50,7 @@ public class NotificationServiceImpl implements NotificationService {
         if (dto.notifyBeforeHours() != null) prefs.setNotifyBeforeHours(dto.notifyBeforeHours());
 
         NotificationPreferences saved = prefsRepository.save(prefs);
-        log.info("Обновлены настройки уведомлений пользователя id={}", currentUserId);
+        log.info("Notification settings updated for user id={}", currentUserId);
         return toDto(saved);
     }
 
@@ -55,9 +58,9 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     public void delete(Long currentUserId) {
         NotificationPreferences prefs = prefsRepository.findByUserId(currentUserId)
-                .orElseThrow(() -> new NotFoundException("Настройки уведомлений не найдены"));
+                .orElseThrow(() -> new NotFoundException("Notification settings not found"));
         prefsRepository.delete(prefs);
-        log.info("Удалены настройки уведомлений пользователя id={}", currentUserId);
+        log.info("Notification settings deleted for user id={}", currentUserId);
     }
 
     @Override
@@ -66,7 +69,7 @@ public class NotificationServiceImpl implements NotificationService {
         NotificationPreferences prefs = prefsRepository.findByUserId(currentUserId)
                 .orElseGet(() -> {
                     User user = userRepository.findById(currentUserId)
-                            .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+                            .orElseThrow(() -> new NotFoundException("User not found"));
                     NotificationPreferences np = new NotificationPreferences();
                     np.setUser(user);
                     return np;
@@ -74,7 +77,7 @@ public class NotificationServiceImpl implements NotificationService {
         String code = UUID.randomUUID().toString().substring(0, 8);
         prefs.setTelegramLinkCode(code);
         prefsRepository.save(prefs);
-        log.info("Сгенерирован код привязки Telegram для пользователя id={}", currentUserId);
+        log.info("Telegram link code generated for user id={}", currentUserId);
         return code;
     }
 

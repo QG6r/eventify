@@ -35,7 +35,7 @@ const Navigation: React.FC = () => {
                 }`}
               >
                 <Calendar className="w-4 h-4 mr-2" />
-                Мероприятия
+                Events
               </Link>
               <Link
                 to="/bookings"
@@ -46,7 +46,7 @@ const Navigation: React.FC = () => {
                 }`}
               >
                 <BookOpen className="w-4 h-4 mr-2" />
-                Мои бронирования
+                My bookings
               </Link>
               {isAdmin && (
                 <Link
@@ -58,7 +58,7 @@ const Navigation: React.FC = () => {
                   }`}
                 >
                   <Users className="w-4 h-4 mr-2" />
-                  Управление бронями
+                  Manage bookings
                 </Link>
               )}
               <Link
@@ -70,7 +70,7 @@ const Navigation: React.FC = () => {
                 }`}
               >
                 <Settings className="w-4 h-4 mr-2" />
-                Настройки
+                Settings
               </Link>
             </div>
           </div>
@@ -81,7 +81,7 @@ const Navigation: React.FC = () => {
                 {user.email}
                 {isAdmin && (
                   <span className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
-                    Админ
+                    Admin
                   </span>
                 )}
               </div>
@@ -90,7 +90,7 @@ const Navigation: React.FC = () => {
                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                Выйти
+                Log out
               </button>
             </div>
           </div>

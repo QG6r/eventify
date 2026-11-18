@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Bookings", description = "Операции с бронированиями")
+@Tag(name = "Bookings", description = "Booking operations")
 @RestController
 @RequestMapping("/bookings")
 @RequiredArgsConstructor
@@ -23,32 +23,32 @@ public class BookingController {
     private final BookingService bookingService;
     private final CurrentUser currentUser;
 
-    @Operation(summary = "Получить свои бронирования")
+    @Operation(summary = "List my bookings")
     @GetMapping
     public List<BookingResponse> getMyBookings() {
         return bookingService.getMyBookings(currentUser.getId());
     }
 
-    @Operation(summary = "Создать бронирование")
+    @Operation(summary = "Create booking")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BookingResponse create(@Valid @RequestBody CreateBookingRequest request) {
         return bookingService.create(request, currentUser.getId());
     }
 
-    @Operation(summary = "Получить бронирование по ID")
+    @Operation(summary = "Get booking by ID")
     @GetMapping("/{id}")
     public BookingResponse getById(@PathVariable Long id) {
         return bookingService.getById(id, currentUser.getId(), currentUser.isAdmin());
     }
 
-    @Operation(summary = "Обновить бронирование")
+    @Operation(summary = "Update booking")
     @PutMapping("/{id}")
     public BookingResponse update(@PathVariable Long id, @Valid @RequestBody UpdateBookingRequest request) {
         return bookingService.update(id, request, currentUser.getId(), currentUser.isAdmin());
     }
 
-    @Operation(summary = "Отменить бронирование")
+    @Operation(summary = "Cancel booking")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {

@@ -48,7 +48,7 @@ public class EventServiceImpl implements EventService {
     @Transactional(readOnly = true)
     public EventResponse getById(Long id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Мероприятие не найдено: id=" + id));
+                .orElseThrow(() -> new NotFoundException("Event not found: id=" + id));
         return toResponseWithAvailability(event);
     }
 
@@ -63,7 +63,7 @@ public class EventServiceImpl implements EventService {
                 .coverUrl(request.coverUrl())
                 .build();
         Event saved = eventRepository.save(event);
-        log.info("Создано мероприятие id={}", saved.getId());
+        log.info("Event created id={}", saved.getId());
         return toResponseWithAvailability(saved);
     }
 
@@ -71,7 +71,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventResponse update(Long id, EventUpdateRequest request) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Мероприятие не найдено: id=" + id));
+                .orElseThrow(() -> new NotFoundException("Event not found: id=" + id));
 
         if (request.title() != null) event.setTitle(request.title());
         if (request.description() != null) event.setDescription(request.description());
@@ -79,7 +79,7 @@ public class EventServiceImpl implements EventService {
         if (request.totalTickets() != null) event.setTotalTickets(request.totalTickets());
         if (request.coverUrl() != null) event.setCoverUrl(request.coverUrl());
 
-        log.info("Обновлено мероприятие id={}", id);
+        log.info("Event updated id={}", id);
         return toResponseWithAvailability(event);
     }
 
@@ -87,10 +87,10 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public void delete(Long id) {
         if (!eventRepository.existsById(id)) {
-            throw new NotFoundException("Мероприятие не найдено: id=" + id);
+            throw new NotFoundException("Event not found: id=" + id);
         }
         eventRepository.deleteById(id);
-        log.info("Удалено мероприятие id={}", id);
+        log.info("Event deleted id={}", id);
     }
 
     private EventResponse toResponseWithAvailability(Event event) {

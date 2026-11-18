@@ -9,10 +9,10 @@ import { ArrowLeft, Save, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const schema = yup.object({
-  title: yup.string().required('Название обязательно'),
-  description: yup.string().required('Описание обязательно'),
-  dateTime: yup.string().required('Дата и время обязательны'),
-  totalTickets: yup.number().positive('Количество билетов должно быть положительным').required('Количество билетов обязательно'),
+  title: yup.string().required('Title is required'),
+  description: yup.string().required('Description is required'),
+  dateTime: yup.string().required('Date and time are required'),
+  totalTickets: yup.number().positive('Ticket count must be positive').required('Ticket count is required'),
 }).required();
 
 type FormData = yup.InferType<typeof schema> & {
@@ -27,7 +27,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(false);
-  const [event, setEvent] = useState<Event | null>(null);
+  const [, setEvent] = useState<Event | null>(null);
 
   const {
     register,
@@ -42,6 +42,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
     if (mode === 'edit' && id) {
       loadEvent();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, id]);
 
   const loadEvent = async () => {
@@ -58,7 +59,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
       });
     } catch (error) {
       console.error('Error loading event:', error);
-      toast.error('Ошибка при загрузке мероприятия');
+      toast.error('Failed to load event');
       navigate('/events');
     } finally {
       setLoading(false);
@@ -79,7 +80,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
         };
         
         await apiService.createEvent(createData);
-        toast.success('Мероприятие создано');
+        toast.success('Event created');
       } else {
         const updateData: EventUpdateRequest = {
           title: data.title,
@@ -90,13 +91,13 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
         };
         
         await apiService.updateEvent(parseInt(id!), updateData);
-        toast.success('Мероприятие обновлено');
+        toast.success('Event updated');
       }
       
       navigate('/events');
     } catch (error: any) {
       console.error('Error saving event:', error);
-      const message = error.response?.data?.message || 'Ошибка при сохранении мероприятия';
+      const message = error.response?.data?.message || 'Failed to save event';
       toast.error(message);
     } finally {
       setLoading(false);
@@ -119,21 +120,21 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
           className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Назад к мероприятиям
+          Back to events
         </button>
       </div>
 
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900">
-            {mode === 'create' ? 'Создать мероприятие' : 'Редактировать мероприятие'}
+            {mode === 'create' ? 'Create event' : 'Edit event'}
           </h1>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-              Название *
+              Title *
             </label>
             <input
               type="text"
@@ -142,7 +143,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
               className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
                 errors.title ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Введите название мероприятия"
+              placeholder="Enter event title"
             />
             {errors.title && (
               <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
@@ -151,7 +152,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
 
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-              Описание *
+              Description *
             </label>
             <textarea
               id="description"
@@ -160,7 +161,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
               className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
                 errors.description ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Введите описание мероприятия"
+              placeholder="Enter event description"
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
@@ -169,7 +170,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
 
           <div>
             <label htmlFor="dateTime" className="block text-sm font-medium text-gray-700 mb-2">
-              Дата и время *
+              Date and time *
             </label>
             <input
               type="datetime-local"
@@ -186,7 +187,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
 
           <div>
             <label htmlFor="totalTickets" className="block text-sm font-medium text-gray-700 mb-2">
-              Общее количество билетов *
+              Total tickets *
             </label>
             <input
               type="number"
@@ -196,7 +197,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
               className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
                 errors.totalTickets ? 'border-red-300' : 'border-gray-300'
               }`}
-              placeholder="Введите количество билетов"
+              placeholder="Enter number of tickets"
             />
             {errors.totalTickets && (
               <p className="mt-1 text-sm text-red-600">{errors.totalTickets.message}</p>
@@ -205,14 +206,14 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
 
           <div>
             <label htmlFor="coverUrl" className="block text-sm font-medium text-gray-700 mb-2">
-              URL обложки
+              Cover URL
             </label>
             <input
               type="text"
               id="coverUrl"
               {...register('coverUrl')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Введите URL обложки (необязательно)"
+              placeholder="Enter cover URL (optional)"
             />
           </div>
 
@@ -222,7 +223,7 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
               onClick={() => navigate('/events')}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Отмена
+              Cancel
             </button>
             <button
               type="submit"
@@ -232,12 +233,12 @@ const EventForm: React.FC<EventFormProps> = ({ mode }) => {
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Сохранение...
+                  Saving...
                 </>
               ) : (
                 <>
                   {mode === 'create' ? <Plus className="w-4 h-4 mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                  {mode === 'create' ? 'Создать' : 'Сохранить'}
+                  {mode === 'create' ? 'Create' : 'Save'}
                 </>
               )}
             </button>
