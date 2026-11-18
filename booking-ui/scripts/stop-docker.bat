@@ -1,8 +1,8 @@
 @echo off
-echo 🛑 Остановка Docker контейнеров...
+echo 🛑 Stopping Docker containers...
 
-REM Останавливаем все контейнеры
+REM Stop all containers
 docker-compose down
 
-echo ✅ Контейнеры остановлены!
+echo ✅ Containers stopped!
 pause 

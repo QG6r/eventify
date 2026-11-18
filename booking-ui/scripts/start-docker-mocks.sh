@@ -1,25 +1,25 @@
 #!/bin/bash
 
-echo "🚀 Запуск Event Booking Frontend в Docker с моками..."
+echo "🚀 Starting Event Booking Frontend in Docker with mock data..."
 
-# Проверяем, установлен ли Docker
+# Check that Docker is installed
 if ! command -v docker &> /dev/null; then
-    echo "❌ Docker не установлен. Установите Docker с https://docs.docker.com/get-docker/"
+    echo "❌ Docker is not installed. Install Docker from https://docs.docker.com/get-docker/"
     exit 1
 fi
 
-# Проверяем, установлен ли Docker Compose
+# Check that Docker Compose is installed
 if ! command -v docker-compose &> /dev/null; then
-    echo "❌ Docker Compose не установлен. Установите Docker Compose с https://docs.docker.com/compose/install/"
+    echo "❌ Docker Compose is not installed. Install Docker Compose from https://docs.docker.com/compose/install/"
     exit 1
 fi
 
-# Останавливаем существующие контейнеры
-echo "🛑 Остановка существующих контейнеров..."
+# Stop existing containers
+echo "🛑 Stopping existing containers..."
 docker-compose down
 
-# Запускаем с моками
-echo "🐳 Запуск с моками..."
+# Start with mock data
+echo "🐳 Starting with mock data..."
 docker-compose --profile docker-mocks up --build
 
-echo "✅ Приложение запущено! Откройте http://localhost:3000" 
+echo "✅ Application started! Open http://localhost:3000" 
