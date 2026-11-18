@@ -290,6 +290,15 @@ let mockNotificationPreferences: NotificationPreferences = {
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Email of the user who is currently logged in (AuthContext keeps it in localStorage under "user").
+const currentUserEmail = (): string => {
+  try {
+    return JSON.parse(localStorage.getItem('user') || '{}').email || '';
+  } catch {
+    return '';
+  }
+};
+
 class MockApiService {
   // Auth endpoints
   async login(data: LoginRequest): Promise<AuthResponse> {
@@ -400,9 +409,9 @@ class MockApiService {
   // Bookings endpoints - returns only the current user's bookings
   async getBookings(): Promise<Booking[]> {
     await delay(300);
-    // The real API filters by the current user here
-    // For the demo we return the bookings of user@example.com
-    return mockBookings.filter(b => b.customerEmail === 'user@example.com');
+    // Like the real API, return only the bookings of the logged-in user: a new user starts with none.
+    const email = currentUserEmail();
+    return mockBookings.filter(b => b.customerEmail === email);
   }
 
   async createBooking(data: CreateBookingRequest): Promise<Booking> {
@@ -423,7 +432,7 @@ class MockApiService {
     const newBooking: Booking = {
       id: Math.max(...mockBookings.map(b => b.id)) + 1,
       event,
-      customerEmail: mockUsers[0].email, // John Smith (current user)
+      customerEmail: currentUserEmail(),
       ticketCount: data.ticketCount,
       confirmed: false,
       createdAt: new Date().toISOString(),
