@@ -124,6 +124,7 @@ Environment variables (see `.env.example`):
 | Variable | Purpose | Default |
 |---|---|---|
 | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | database credentials (Docker Compose) | see `.env.example` |
+| `CORS_ALLOWED_ORIGINS` | comma-separated browser origins allowed to call the API | `http://localhost:3000,http://localhost:3001` |
 | `JWT_SECRET` | key used to sign tokens, at least 32 bytes | development value, **change it** |
 | `JWT_EXPIRATION_MS` | token lifetime | 86400000 (24 h) |
 | `BOOKING_EXPIRY_MINUTES` | how long unconfirmed bookings hold seats | 30 |

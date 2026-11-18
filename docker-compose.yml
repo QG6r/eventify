@@ -31,6 +31,7 @@ services:
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
       BOOKING_EXPIRY_MINUTES: ${BOOKING_EXPIRY_MINUTES}
       # Demo data is loaded by default; set FLYWAY_LOCATIONS=classpath:db/migration in .env to disable it
